@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trackyourspending/widgets/chart.dart';
 import 'package:trackyourspending/widgets/new_transaction.dart';
 import 'package:trackyourspending/widgets/transaction_list.dart';
 
@@ -15,7 +16,35 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        accentColor: Colors.white,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        fontFamily: 'Quicksand',
+        textTheme: ThemeData.dark().textTheme.copyWith(
+              headline1: TextStyle(
+                fontFamily: 'OpenSans',
+                fontSize: 18,
+                color: Colors.white,
+              ),
+              headline2: TextStyle(
+                fontFamily: 'OpenSans',
+                fontSize: 18,
+                color: Colors.black,
+              ),
+              bodyText1: TextStyle(
+                fontFamily: 'OpenSans',
+                fontSize: 15,
+                color: Colors.black,
+              ),
+            ),
+        appBarTheme: AppBarTheme(
+          textTheme: ThemeData.dark().textTheme.copyWith(
+                headline6: TextStyle(
+                  fontFamily: 'OpenSans',
+                  fontSize: 25,
+                  color: Colors.white,
+                ),
+              ),
+        ),
       ),
       home: MyHomePage(),
     );
@@ -29,16 +58,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> userTransactions = [
-    Transaction(
-        id: "1",
-        title: "decaff coffee",
-        amount: 6.98,
-        date: DateTime(2020, 05, 25)),
-    Transaction(
-        id: "2",
-        title: "bird eye chilli",
-        amount: 0.90,
-        date: DateTime(2020, 05, 25)),
+    // Transaction(
+    //     id: "1",
+    //     title: "decaff coffee",
+    //     amount: 6.98,
+    //     date: DateTime(2020, 05, 25)),
+    // Transaction(
+    //     id: "2",
+    //     title: "bird eye chilli",
+    //     amount: 0.90,
+    //     date: DateTime(2020, 05, 25)),
   ];
 
   void addNewTransaction(String title, double amount) {
@@ -63,11 +92,21 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  List<Transaction> get recentTransactions {
+    return userTransactions
+        .where((transaction) => transaction.date
+            .isAfter(DateTime.now().subtract(Duration(days: 7))))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter app'),
+        title: Text(
+          'Flutter app',
+        ),
+        backgroundColor: Theme.of(context).primaryColorDark,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
@@ -81,22 +120,22 @@ class _MyHomePageState extends State<MyHomePage> {
             Container(
               width: double.infinity,
               child: Card(
-                color: Colors.black,
-                child: Text(
-                  'Chart!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.red),
-                ),
-                elevation: 10,
+                color: Theme.of(context).primaryColorDark,
+                child: Chart(recentTransactions),
               ),
             ),
             TransactionList(userTransactions),
           ],
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Icon(Icons.add),
+        onPressed: () => popUpNewTransactionForm(context),
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).accentColor,
+        ),
+        backgroundColor: Theme.of(context).primaryColorDark,
       ),
     );
   }

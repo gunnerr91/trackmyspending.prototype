@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 
-class NewTransaction extends StatelessWidget {
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
+class NewTransaction extends StatefulWidget {
   final Function addNewItem;
 
   NewTransaction(this.addNewItem);
+
+  @override
+  _NewTransactionState createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
+  final titleController = TextEditingController();
+
+  final amountController = TextEditingController();
 
   void onSubmit() {
     if (titleController.text.isEmpty ||
@@ -13,7 +20,10 @@ class NewTransaction extends StatelessWidget {
       return;
     }
 
-    addNewItem(titleController.text, double.parse(amountController.text));
+    widget.addNewItem(
+        titleController.text, double.parse(amountController.text));
+
+    Navigator.of(context).pop();
   }
 
   @override
@@ -30,6 +40,8 @@ class NewTransaction extends StatelessWidget {
               ),
               controller: titleController,
               onSubmitted: (_) => onSubmit(),
+              style:
+                  TextStyle(color: Theme.of(context).textTheme.headline2.color),
             ),
             TextField(
               decoration: InputDecoration(
@@ -38,11 +50,16 @@ class NewTransaction extends StatelessWidget {
               controller: amountController,
               keyboardType: TextInputType.number,
               onSubmitted: (_) => onSubmit(),
+              style:
+                  TextStyle(color: Theme.of(context).textTheme.headline2.color),
             ),
             FlatButton(
-              child: Text('Add transaction'),
+              child: Text(
+                'Add transaction',
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
               onPressed: () => onSubmit(),
-              color: Colors.red,
+              color: Theme.of(context).primaryColorDark,
             )
           ],
         ),
