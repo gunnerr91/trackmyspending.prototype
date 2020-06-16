@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:trackyourspending/models/transaction.dart';
+import 'package:trackyourspending/widgets/chart_bar.dart';
 
 class Chart extends StatelessWidget {
   final List<Transaction> transactions;
@@ -27,14 +28,41 @@ class Chart extends StatelessWidget {
     });
   }
 
+  double get totalSpending {
+    return groupedTransactionValues.fold(0.0, (sum, item) {
+      return sum + item['Amount'];
+    });
+  }
+
+  double getSpendingPctOfTotalForDay(double amount) {
+    if (totalSpending < 1) {
+      return 0.0;
+    } else {
+      return amount / totalSpending;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print(this.groupedTransactionValues);
     return Card(
-      elevation: 5,
-      margin: EdgeInsets.all(5),
-      child: Row(
-        children: <Widget>[],
+      elevation: 6,
+      margin: EdgeInsets.all(25),
+      color: Colors.white,
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Row(
+          // mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: groupedTransactionValues
+              .map(
+                (e) => Flexible(
+                  fit: FlexFit.tight,
+                  child: ChartBar(e['Day'], e['Amount'],
+                      getSpendingPctOfTotalForDay(e['Amount'] as double)),
+                ),
+              )
+              .toList(),
+        ),
       ),
     );
   }

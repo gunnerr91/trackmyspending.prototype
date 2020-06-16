@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
         accentColor: Colors.white,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'Quicksand',
@@ -119,10 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Container(
               width: double.infinity,
-              child: Card(
-                color: Theme.of(context).primaryColorDark,
-                child: Chart(recentTransactions),
-              ),
+              child: Chart(recentTransactions),
             ),
             TransactionList(userTransactions),
           ],
