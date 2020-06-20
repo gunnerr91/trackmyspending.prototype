@@ -4,13 +4,14 @@ import 'package:trackyourspending/models/transaction.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> userTransactions;
+  final Function deleteTransaction;
 
-  TransactionList(this.userTransactions);
+  TransactionList(this.userTransactions, this.deleteTransaction);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 450,
       child: userTransactions.length < 1
           ? Column(
               children: <Widget>[
@@ -56,6 +57,12 @@ class TransactionList extends StatelessWidget {
                       DateFormat('E d, MMM yyyy')
                           .format(userTransactions[index].date),
                       style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      color: Colors.red,
+                      onPressed: () =>
+                          deleteTransaction(userTransactions[index].id),
                     ),
                   ),
                 );

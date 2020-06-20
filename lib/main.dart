@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.green,
@@ -70,12 +71,12 @@ class _MyHomePageState extends State<MyHomePage> {
     //     date: DateTime(2020, 05, 25)),
   ];
 
-  void addNewTransaction(String title, double amount) {
+  void addNewTransaction(String title, double amount, DateTime chosenDate) {
     final newTransaction = new Transaction(
       id: DateTime.now().toString(),
       title: title,
       amount: amount,
-      date: DateTime.now(),
+      date: chosenDate,
     );
     setState(() {
       userTransactions.add(newTransaction);
@@ -90,6 +91,12 @@ class _MyHomePageState extends State<MyHomePage> {
         child: NewTransaction(addNewTransaction),
       ),
     );
+  }
+
+  void deleteTransaction(String id) {
+    setState(() {
+      userTransactions.removeWhere((element) => element.id == id);
+    });
   }
 
   List<Transaction> get recentTransactions {
@@ -121,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
               width: double.infinity,
               child: Chart(recentTransactions),
             ),
-            TransactionList(userTransactions),
+            TransactionList(userTransactions, deleteTransaction),
           ],
         ),
       ),
