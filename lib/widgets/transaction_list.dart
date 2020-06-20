@@ -33,47 +33,30 @@ class TransactionList extends StatelessWidget {
           : ListView.builder(
               itemBuilder: (context, index) {
                 return Card(
-                  color: Theme.of(context).primaryColorDark,
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 10,
-                        ),
-                        child: Text(
-                          '£${userTransactions[index].amount.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            color: Theme.of(context).accentColor,
-                            fontSize: 20,
-                          ),
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Theme.of(context).accentColor,
-                            width: 2,
-                          ),
-                        ),
-                        padding: EdgeInsets.all(10),
+                  elevation: 2,
+                  margin: EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 5,
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      radius: 30,
+                      child: Padding(
+                        padding: EdgeInsets.all(5),
+                        child: FittedBox(
+                            child: Text(
+                                '£${userTransactions[index].amount.toStringAsFixed(2)}')),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            userTransactions[index].title,
-                            style: Theme.of(context).textTheme.headline1,
-                          ),
-                          Text(
-                            DateFormat('E d, MMM yyyy')
-                                .format(userTransactions[index].date),
-                            style: TextStyle(
-                              color: Theme.of(context).accentColor,
-                              fontSize: 10,
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
+                    ),
+                    title: Text(
+                      userTransactions[index].title,
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    subtitle: Text(
+                      DateFormat('E d, MMM yyyy')
+                          .format(userTransactions[index].date),
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
                   ),
                 );
               },
