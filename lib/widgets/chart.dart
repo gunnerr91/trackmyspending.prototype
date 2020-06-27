@@ -19,8 +19,6 @@ class Chart extends StatelessWidget {
           amountForTheDay += transaction.amount;
         }
       }
-      print(DateFormat.E().format(dayOfTheWeek));
-      print(amountForTheDay);
       return {
         "Day": DateFormat.E().format(dayOfTheWeek),
         "Amount": amountForTheDay
@@ -44,7 +42,6 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(this.groupedTransactionValues);
     return Card(
       elevation: 6,
       margin: EdgeInsets.all(25),
