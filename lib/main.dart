@@ -113,41 +113,91 @@ class _MyHomePageState extends State<MyHomePage> {
         .toList();
   }
 
+  List<Widget> _buildPortraitContent(
+      MediaQueryData mediaQuery, double topPartHeight, Widget transactionList) {
+    return [
+      Container(
+        height: (mediaQuery.size.height - topPartHeight) * .3,
+        child: Chart(recentTransactions),
+      ),
+      transactionList
+    ];
+  }
+
+  List<Widget> _buildLandscapeContent(
+      MediaQueryData mediaQuery, double topPartHeight, Widget transactionList) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'Show Chart',
+            style: Theme.of(context).textTheme.bodyText1,
+          ),
+          Switch.adaptive(
+            value: _showChart,
+            onChanged: (value) {
+              setState(() {
+                _showChart = value;
+              });
+            },
+          ),
+        ],
+      ),
+      _showChart
+          ? Container(
+              height: (mediaQuery.size.height -
+                      topPartHeight -
+                      mediaQuery.padding.top) *
+                  .7,
+              child: Chart(recentTransactions),
+            )
+          : transactionList
+    ];
+  }
+
+  Widget _buildAppBarForIOS() {
+    return CupertinoNavigationBar(
+      middle: Text(
+        'Flutter app',
+      ),
+      backgroundColor: Theme.of(context).primaryColorDark,
+      trailing: Row(
+        mainAxisSize: MainAxisSize
+            .min, //this property ensures that the row uses only the requried width
+        children: <Widget>[
+          GestureDetector(
+            onTap: () {
+              popUpNewTransactionForm(context);
+            },
+            child: Icon(CupertinoIcons.add),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBarForAndroid() {
+    return AppBar(
+      title: Text(
+        'Flutter app',
+      ),
+      backgroundColor: Theme.of(context).primaryColorDark,
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => popUpNewTransactionForm(context),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final isLandscape = mediaQuery.orientation == Orientation.landscape;
-    final PreferredSizeWidget appBar = Platform.isIOS
-        ? CupertinoNavigationBar(
-            middle: Text(
-              'Flutter app',
-            ),
-            backgroundColor: Theme.of(context).primaryColorDark,
-            trailing: Row(
-              mainAxisSize: MainAxisSize
-                  .min, //this property ensures that the row uses only the requried width
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () {
-                    popUpNewTransactionForm(context);
-                  },
-                  child: Icon(CupertinoIcons.add),
-                ),
-              ],
-            ),
-          )
-        : AppBar(
-            title: Text(
-              'Flutter app',
-            ),
-            backgroundColor: Theme.of(context).primaryColorDark,
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () => popUpNewTransactionForm(context),
-              ),
-            ],
-          );
+    final PreferredSizeWidget appBar =
+        Platform.isIOS ? _buildAppBarForIOS() : _buildAppBarForAndroid();
     var topPartHeight = appBar.preferredSize.height + mediaQuery.padding.top;
 
     final transactionList = Container(
@@ -160,36 +210,11 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             if (isLandscape)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Show Chart',
-                    style: Theme.of(context).textTheme.bodyText1,
-                  ),
-                  Switch.adaptive(
-                    value: _showChart,
-                    onChanged: (value) {
-                      setState(() {
-                        _showChart = value;
-                      });
-                    },
-                  ),
-                ],
-              ),
+              ..._buildLandscapeContent(
+                  mediaQuery, topPartHeight, transactionList),
             if (!isLandscape)
-              Container(
-                height: (mediaQuery.size.height - topPartHeight) * .3,
-                child: Chart(recentTransactions),
-              ),
-            if (!isLandscape) transactionList,
-            if (isLandscape)
-              _showChart
-                  ? Container(
-                      height: (mediaQuery.size.height - topPartHeight) * .7,
-                      child: Chart(recentTransactions),
-                    )
-                  : transactionList,
+              ..._buildPortraitContent(
+                  mediaQuery, topPartHeight, transactionList),
           ],
         ),
       ),
