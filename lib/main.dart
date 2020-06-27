@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:trackyourspending/widgets/chart.dart';
 import 'package:trackyourspending/widgets/new_transaction.dart';
@@ -6,6 +8,9 @@ import 'package:trackyourspending/widgets/transaction_list.dart';
 import 'models/transaction.dart';
 
 void main() {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setPreferredOrientations(
+  //     [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(MyApp());
 }
 
@@ -99,6 +104,8 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  var _showChart = false;
+
   List<Transaction> get recentTransactions {
     return userTransactions
         .where((transaction) => transaction.date
@@ -108,47 +115,104 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final appBar = AppBar(
-      title: Text(
-        'Flutter app',
-      ),
-      backgroundColor: Theme.of(context).primaryColorDark,
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.add),
-          onPressed: () => popUpNewTransactionForm(context),
-        ),
-      ],
-    );
-    var topPartHeight =
-        appBar.preferredSize.height + MediaQuery.of(context).padding.top;
+    final mediaQuery = MediaQuery.of(context);
+    final isLandscape = mediaQuery.orientation == Orientation.landscape;
+    final PreferredSizeWidget appBar = Platform.isIOS
+        ? CupertinoNavigationBar(
+            middle: Text(
+              'Flutter app',
+            ),
+            backgroundColor: Theme.of(context).primaryColorDark,
+            trailing: Row(
+              mainAxisSize: MainAxisSize
+                  .min, //this property ensures that the row uses only the requried width
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () {
+                    popUpNewTransactionForm(context);
+                  },
+                  child: Icon(CupertinoIcons.add),
+                ),
+              ],
+            ),
+          )
+        : AppBar(
+            title: Text(
+              'Flutter app',
+            ),
+            backgroundColor: Theme.of(context).primaryColorDark,
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () => popUpNewTransactionForm(context),
+              ),
+            ],
+          );
+    var topPartHeight = appBar.preferredSize.height + mediaQuery.padding.top;
 
-    return Scaffold(
-      appBar: appBar,
-      body: SingleChildScrollView(
+    final transactionList = Container(
+      height: (mediaQuery.size.height - topPartHeight) * .7,
+      child: TransactionList(userTransactions, deleteTransaction),
+    );
+    final mainBody = SafeArea(
+      child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Container(
-              height: (MediaQuery.of(context).size.height - topPartHeight) * .3,
-              child: Chart(recentTransactions),
-            ),
-            Container(
-              height: (MediaQuery.of(context).size.height - topPartHeight) * .7,
-              child: TransactionList(userTransactions, deleteTransaction),
-            ),
+            if (isLandscape)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    'Show Chart',
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                  Switch.adaptive(
+                    value: _showChart,
+                    onChanged: (value) {
+                      setState(() {
+                        _showChart = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            if (!isLandscape)
+              Container(
+                height: (mediaQuery.size.height - topPartHeight) * .3,
+                child: Chart(recentTransactions),
+              ),
+            if (!isLandscape) transactionList,
+            if (isLandscape)
+              _showChart
+                  ? Container(
+                      height: (mediaQuery.size.height - topPartHeight) * .7,
+                      child: Chart(recentTransactions),
+                    )
+                  : transactionList,
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => popUpNewTransactionForm(context),
-        child: Icon(
-          Icons.add,
-          color: Theme.of(context).accentColor,
-        ),
-        backgroundColor: Theme.of(context).primaryColorDark,
-      ),
     );
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: mainBody,
+          )
+        : Scaffold(
+            appBar: appBar,
+            body: mainBody,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    onPressed: () => popUpNewTransactionForm(context),
+                    child: Icon(
+                      Icons.add,
+                      color: Theme.of(context).accentColor,
+                    ),
+                    backgroundColor: Theme.of(context).primaryColorDark,
+                  ),
+          );
   }
 }

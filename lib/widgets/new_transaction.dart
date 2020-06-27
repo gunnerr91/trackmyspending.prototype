@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import 'adaptive_flat_button.dart';
 
 class NewTransaction extends StatefulWidget {
   final Function addNewItem;
@@ -47,63 +52,66 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Container(
-        padding: EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Title',
+    return SingleChildScrollView(
+      child: Card(
+        child: Container(
+          padding: EdgeInsets.only(
+            top: 15,
+            left: 15,
+            right: 15,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 15,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                ),
+                controller: titleController,
+                onSubmitted: (_) => onSubmit(),
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.headline2.color),
               ),
-              controller: titleController,
-              onSubmitted: (_) => onSubmit(),
-              style:
-                  TextStyle(color: Theme.of(context).textTheme.headline2.color),
-            ),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Amount',
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Amount',
+                ),
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                onSubmitted: (_) => onSubmit(),
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.headline2.color),
               ),
-              controller: amountController,
-              keyboardType: TextInputType.number,
-              onSubmitted: (_) => onSubmit(),
-              style:
-                  TextStyle(color: Theme.of(context).textTheme.headline2.color),
-            ),
-            Container(
-              height: 70,
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      selectedDate == null
-                          ? 'No date chosen'
-                          : DateFormat('E d, MMM yyyy').format(selectedDate),
-                      style: TextStyle(color: Theme.of(context).primaryColor),
+              Container(
+                height: 70,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        selectedDate == null
+                            ? 'No date chosen'
+                            : DateFormat('E d, MMM yyyy').format(selectedDate),
+                        style: TextStyle(color: Theme.of(context).primaryColor),
+                      ),
                     ),
-                  ),
-                  FlatButton(
-                    textColor: Theme.of(context).primaryColor,
-                    child: Text(
-                      'Choose date',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    AdaptiveFlatButton(
+                      label: "Choose date",
+                      handler: presentDatePicker,
                     ),
-                    onPressed: presentDatePicker,
-                  )
-                ],
+                  ],
+                ),
               ),
-            ),
-            RaisedButton(
-              child: Text(
-                'Add transaction',
-                style: TextStyle(color: Theme.of(context).accentColor),
-              ),
-              onPressed: () => onSubmit(),
-              color: Theme.of(context).primaryColorDark,
-            )
-          ],
+              RaisedButton(
+                child: Text(
+                  'Add transaction',
+                  style: TextStyle(color: Theme.of(context).accentColor),
+                ),
+                onPressed: () => onSubmit(),
+                color: Theme.of(context).primaryColorDark,
+              )
+            ],
+          ),
         ),
       ),
     );
